@@ -1,0 +1,19 @@
+{
+  "command": "run",
+  "cutoff": "2018-08-31",
+  "status": "failed",
+  "started_at": "2026-10-30T09:40:00.639171+00:00",
+  "seconds": {
+    "quality": 5.139,
+    "ingest": 158.638,
+    "build": 60.189
+  },
+  "run_id": "20261030T094000-d7b0af7f",
+  "checks_passed": 14,
+  "checks_total": 14,
+  "source_rows": 1550922,
+  "active_step": "build",
+  "error_type": "CalledProcessError",
+  "finished_at": "2026-10-30T09:45:55.155763+00:00",
+  "total_seconds": 223.966
+}

@@ -1,0 +1,1 @@
+select 1 where abs((select sum(price) from {{ ref('stg_order_items') }} i join {{ ref('fct_orders') }} o using(order_id) where o.order_status='delivered')-(select sum(gmv) from {{ ref('seller_scorecard') }}))>0.01

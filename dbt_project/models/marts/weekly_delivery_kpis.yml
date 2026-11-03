@@ -1,0 +1,19 @@
+version: 2
+
+models:
+  - name: weekly_delivery_kpis
+    description: Weekly delivery reliability and review metrics.
+
+    columns:
+      - name: week
+        data_tests:
+          - not_null
+          - unique
+
+      - name: delivered_orders
+        data_tests:
+          - not_null
+
+      - name: late_orders
+        data_tests:
+          - not_null

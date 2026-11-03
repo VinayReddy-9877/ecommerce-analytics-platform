@@ -1,0 +1,15 @@
+﻿version: 2
+
+models:
+  - name: weekly_delivery_alerts
+    description: Weekly late-delivery monitoring.
+
+    columns:
+      - name: week
+        data_tests:
+          - not_null
+          - unique
+
+      - name: late_rate_alert
+        data_tests:
+          - not_null

@@ -1,0 +1,7 @@
+order_number,buyer_id,purchase_date,line_total,status
+A001,C01,2025-01-05,100,delivered
+A001,C01,2025-01-05,50,delivered
+A002,C02,2025-02-05,200,delivered
+A003,C01,2025-02-10,100,delivered
+A004,C03,2025-03-04,50,delivered
+A005,C04,2025-03-06,75,cancelled

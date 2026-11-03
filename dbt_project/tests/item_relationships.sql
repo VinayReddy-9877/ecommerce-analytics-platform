@@ -1,0 +1,1 @@
+select i.order_id from {{ ref('stg_order_items') }} i left join {{ ref('stg_orders') }} o using(order_id) left join {{ ref('stg_products') }} p using(product_id) left join {{ ref('stg_sellers') }} s using(seller_id) where o.order_id is null or p.product_id is null or s.seller_id is null

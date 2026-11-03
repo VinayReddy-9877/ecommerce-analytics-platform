@@ -1,0 +1,779 @@
+{
+  "name": "Olist",
+  "compatibilityLevel": 1600,
+  "model": {
+    "culture": "en-US",
+    "defaultPowerBIDataSourceVersion": "powerBI_V3",
+    "sourceQueryCulture": "en-US",
+    "tables": [
+      {
+        "name": "Customers",
+        "columns": [
+          {
+            "name": "customer_unique_id",
+            "dataType": "string",
+            "sourceColumn": "customer_unique_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "recency_days",
+            "dataType": "int64",
+            "sourceColumn": "recency_days",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "frequency",
+            "dataType": "int64",
+            "sourceColumn": "frequency",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "monetary_value",
+            "dataType": "double",
+            "sourceColumn": "monetary_value",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "segment",
+            "dataType": "string",
+            "sourceColumn": "segment",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "monetary_percentile",
+            "dataType": "double",
+            "sourceColumn": "monetary_percentile",
+            "summarizeBy": "none"
+          }
+        ],
+        "measures": [
+          {
+            "name": "Buying Customers",
+            "expression": "COUNTROWS(Customers)",
+            "formatString": "#,##0"
+          },
+          {
+            "name": "Repeat Customer Rate",
+            "expression": "DIVIDE(CALCULATE(COUNTROWS(Customers),Customers[frequency]>1),COUNTROWS(Customers))",
+            "formatString": "0.00%"
+          },
+          {
+            "name": "Customer GMV",
+            "expression": "SUM(Customers[monetary_value])",
+            "formatString": "\"BRL \"#,##0"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Customers",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(SourceFolder & \"/customer_rfm.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Typed = Table.TransformColumnTypes(Headers, {{\"customer_unique_id\", type text}, {\"recency_days\", Int64.Type}, {\"frequency\", Int64.Type}, {\"monetary_value\", type number}, {\"segment\", type text}, {\"monetary_percentile\", type number}}, \"en-US\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Delivery",
+        "columns": [
+          {
+            "name": "customer_state",
+            "dataType": "string",
+            "sourceColumn": "customer_state",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "delivered_orders",
+            "dataType": "int64",
+            "sourceColumn": "delivered_orders",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "delivery_denominator",
+            "dataType": "int64",
+            "sourceColumn": "delivery_denominator",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "late_rate",
+            "dataType": "double",
+            "sourceColumn": "late_rate",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "mean_delivery_days",
+            "dataType": "double",
+            "sourceColumn": "mean_delivery_days",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "late_review_score",
+            "dataType": "double",
+            "sourceColumn": "late_review_score",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "on_time_review_score",
+            "dataType": "double",
+            "sourceColumn": "on_time_review_score",
+            "summarizeBy": "none"
+          }
+        ],
+        "measures": [
+          {
+            "name": "Late Rate",
+            "expression": "DIVIDE(SUMX(Delivery,Delivery[late_rate]*Delivery[delivery_denominator]),SUM(Delivery[delivery_denominator]))",
+            "formatString": "0.00%"
+          },
+          {
+            "name": "Mean Delivery Days",
+            "expression": "DIVIDE(SUMX(Delivery,Delivery[mean_delivery_days]*Delivery[delivery_denominator]),SUM(Delivery[delivery_denominator]))",
+            "formatString": "0.0"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Delivery",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(SourceFolder & \"/delivery_performance.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Typed = Table.TransformColumnTypes(Headers, {{\"customer_state\", type text}, {\"delivered_orders\", Int64.Type}, {\"delivery_denominator\", Int64.Type}, {\"late_rate\", type number}, {\"mean_delivery_days\", type number}, {\"late_review_score\", type number}, {\"on_time_review_score\", type number}}, \"en-US\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Cohorts",
+        "columns": [
+          {
+            "name": "cohort",
+            "dataType": "dateTime",
+            "sourceColumn": "cohort",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "cohort_size",
+            "dataType": "int64",
+            "sourceColumn": "cohort_size",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "month",
+            "dataType": "dateTime",
+            "sourceColumn": "month",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "month_number",
+            "dataType": "int64",
+            "sourceColumn": "month_number",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "active_customers",
+            "dataType": "int64",
+            "sourceColumn": "active_customers",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "retention",
+            "dataType": "double",
+            "sourceColumn": "retention",
+            "summarizeBy": "none"
+          }
+        ],
+        "measures": [
+          {
+            "name": "Cohort Retention",
+            "expression": "IF(ISINSCOPE(Cohorts[cohort]) && ISINSCOPE(Cohorts[month_number]),DIVIDE(SUM(Cohorts[active_customers]),SUM(Cohorts[cohort_size])))",
+            "formatString": "0.00%"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Cohorts",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(SourceFolder & \"/cohort_retention.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Typed = Table.TransformColumnTypes(Headers, {{\"cohort\", type datetime}, {\"cohort_size\", Int64.Type}, {\"month\", type datetime}, {\"month_number\", Int64.Type}, {\"active_customers\", Int64.Type}, {\"retention\", type number}}, \"en-US\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Repeat",
+        "columns": [
+          {
+            "name": "experience",
+            "dataType": "string",
+            "sourceColumn": "experience",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "customers",
+            "dataType": "int64",
+            "sourceColumn": "customers",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "repeat_customers",
+            "dataType": "int64",
+            "sourceColumn": "repeat_customers",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "repeat_rate",
+            "dataType": "double",
+            "sourceColumn": "repeat_rate",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "repeat_rate_30d",
+            "dataType": "double",
+            "sourceColumn": "repeat_rate_30d",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "repeat_rate_60d",
+            "dataType": "double",
+            "sourceColumn": "repeat_rate_60d",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "followup_gmv",
+            "dataType": "double",
+            "sourceColumn": "followup_gmv",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "followup_gmv_per_customer",
+            "dataType": "double",
+            "sourceColumn": "followup_gmv_per_customer",
+            "summarizeBy": "none"
+          }
+        ],
+        "measures": [
+          {
+            "name": "Repeat Within 90 Days",
+            "expression": "DIVIDE(SUM(Repeat[repeat_customers]),SUM(Repeat[customers]))",
+            "formatString": "0.00%"
+          },
+          {
+            "name": "Followup GMV Per Customer",
+            "expression": "DIVIDE(SUM(Repeat[followup_gmv]),SUM(Repeat[customers]))",
+            "formatString": "\"BRL \"0.00"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Repeat",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(SourceFolder & \"/repeat_delivery_summary.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Typed = Table.TransformColumnTypes(Headers, {{\"experience\", type text}, {\"customers\", Int64.Type}, {\"repeat_customers\", Int64.Type}, {\"repeat_rate\", type number}, {\"repeat_rate_30d\", type number}, {\"repeat_rate_60d\", type number}, {\"followup_gmv\", type number}, {\"followup_gmv_per_customer\", type number}}, \"en-US\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Sellers",
+        "columns": [
+          {
+            "name": "seller_id",
+            "dataType": "string",
+            "sourceColumn": "seller_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "orders",
+            "dataType": "int64",
+            "sourceColumn": "orders",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "gmv",
+            "dataType": "double",
+            "sourceColumn": "gmv",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "mean_order_review_score",
+            "dataType": "double",
+            "sourceColumn": "mean_order_review_score",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "late_rate",
+            "dataType": "double",
+            "sourceColumn": "late_rate",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "state",
+            "dataType": "string",
+            "sourceColumn": "state",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "gmv_rank",
+            "dataType": "int64",
+            "sourceColumn": "gmv_rank",
+            "summarizeBy": "none"
+          }
+        ],
+        "measures": [],
+        "partitions": [
+          {
+            "name": "Sellers",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(File.Contents(SourceFolder & \"/seller_scorecard.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Typed = Table.TransformColumnTypes(Headers, {{\"seller_id\", type text}, {\"orders\", Int64.Type}, {\"gmv\", type number}, {\"mean_order_review_score\", type number}, {\"late_rate\", type number}, {\"state\", type text}, {\"gmv_rank\", Int64.Type}}, \"en-US\")",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Sales",
+        "columns": [
+          {
+            "name": "order_id",
+            "dataType": "string",
+            "sourceColumn": "order_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "day",
+            "dataType": "dateTime",
+            "sourceColumn": "day",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "customer_unique_id",
+            "dataType": "string",
+            "sourceColumn": "customer_unique_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "customer_state",
+            "dataType": "string",
+            "sourceColumn": "customer_state",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "gmv",
+            "dataType": "double",
+            "sourceColumn": "gmv",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "late",
+            "dataType": "double",
+            "sourceColumn": "late",
+            "summarizeBy": "none"
+          }
+        ],
+        "measures": [
+          {
+            "name": "GMV BRL",
+            "expression": "SUM(Sales[gmv])",
+            "formatString": "\"BRL \"#,##0.00"
+          },
+          {
+            "name": "Delivered Orders",
+            "expression": "COUNTROWS(Sales)",
+            "formatString": "#,##0"
+          },
+          {
+            "name": "AOV BRL",
+            "expression": "DIVIDE([GMV BRL],[Delivered Orders])",
+            "formatString": "\"BRL \"#,##0.00"
+          },
+          {
+            "name": "GMV Previous Month",
+            "expression": "CALCULATE([GMV BRL],DATEADD('Calendar'[day],-1,MONTH))",
+            "formatString": "\"BRL \"#,##0.00"
+          },
+          {
+            "name": "GMV MoM",
+            "expression": "IF(HASONEVALUE('Calendar'[year_month]),DIVIDE([GMV BRL]-[GMV Previous Month],[GMV Previous Month]))",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "GMV YTD",
+            "expression": "TOTALYTD([GMV BRL],'Calendar'[day])",
+            "formatString": "\"BRL \"#,##0.00"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Sales",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                " Source = Csv.Document(File.Contents(SourceFolder & \"/bi_orders.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                " Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                " Typed = Table.TransformColumnTypes(Headers, {{\"order_id\", type text}, {\"day\", type datetime}, {\"customer_unique_id\", type text}, {\"customer_state\", type text}, {\"gmv\", type number}, {\"late\", type number}}, \"en-US\")",
+                "in",
+                " Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Items",
+        "columns": [
+          {
+            "name": "order_id",
+            "dataType": "string",
+            "sourceColumn": "order_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "order_item_id",
+            "dataType": "int64",
+            "sourceColumn": "order_item_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "day",
+            "dataType": "dateTime",
+            "sourceColumn": "day",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "seller_id",
+            "dataType": "string",
+            "sourceColumn": "seller_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "category",
+            "dataType": "string",
+            "sourceColumn": "category",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "customer_state",
+            "dataType": "string",
+            "sourceColumn": "customer_state",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "price",
+            "dataType": "double",
+            "sourceColumn": "price",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "late",
+            "dataType": "double",
+            "sourceColumn": "late",
+            "summarizeBy": "none"
+          }
+        ],
+        "measures": [
+          {
+            "name": "Item GMV",
+            "expression": "SUM(Items[price])",
+            "formatString": "\"BRL \"#,##0.00"
+          },
+          {
+            "name": "Seller Orders",
+            "expression": "DISTINCTCOUNT(Items[order_id])",
+            "formatString": "#,##0"
+          },
+          {
+            "name": "Seller Late Rate",
+            "expression": "DIVIDE(CALCULATE(DISTINCTCOUNT(Items[order_id]),Items[late]=1),CALCULATE(DISTINCTCOUNT(Items[order_id]),NOT ISBLANK(Items[late])))",
+            "formatString": "0.00%"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Items",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                " Source = Csv.Document(File.Contents(SourceFolder & \"/bi_items.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                " Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                " Typed = Table.TransformColumnTypes(Headers, {{\"order_id\", type text}, {\"order_item_id\", Int64.Type}, {\"day\", type datetime}, {\"seller_id\", type text}, {\"category\", type text}, {\"customer_state\", type text}, {\"price\", type number}, {\"late\", type number}}, \"en-US\")",
+                "in",
+                " Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Calendar",
+        "columns": [
+          {
+            "name": "day",
+            "dataType": "dateTime",
+            "sourceColumn": "day",
+            "summarizeBy": "none",
+            "isKey": true
+          },
+          {
+            "name": "year",
+            "dataType": "int64",
+            "sourceColumn": "year",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "month",
+            "dataType": "int64",
+            "sourceColumn": "month",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "year_month",
+            "dataType": "string",
+            "sourceColumn": "year_month",
+            "summarizeBy": "none"
+          }
+        ],
+        "measures": [],
+        "partitions": [
+          {
+            "name": "Calendar",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                " Source = Csv.Document(File.Contents(SourceFolder & \"/dim_calendar.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                " Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                " Typed = Table.TransformColumnTypes(Headers, {{\"day\", type datetime}, {\"year\", Int64.Type}, {\"month\", Int64.Type}, {\"year_month\", type text}}, \"en-US\")",
+                "in",
+                " Typed"
+              ]
+            }
+          }
+        ],
+        "dataCategory": "Time"
+      },
+      {
+        "name": "State",
+        "columns": [
+          {
+            "name": "customer_state",
+            "dataType": "string",
+            "sourceColumn": "customer_state",
+            "summarizeBy": "none"
+          }
+        ],
+        "measures": [],
+        "partitions": [
+          {
+            "name": "State",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                " Source = Csv.Document(File.Contents(SourceFolder & \"/dim_state.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                " Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                " Typed = Table.TransformColumnTypes(Headers, {{\"customer_state\", type text}}, \"en-US\")",
+                "in",
+                " Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Seller",
+        "columns": [
+          {
+            "name": "seller_id",
+            "dataType": "string",
+            "sourceColumn": "seller_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "seller_state",
+            "dataType": "string",
+            "sourceColumn": "seller_state",
+            "summarizeBy": "none"
+          }
+        ],
+        "measures": [],
+        "partitions": [
+          {
+            "name": "Seller",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                " Source = Csv.Document(File.Contents(SourceFolder & \"/dim_seller.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                " Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                " Typed = Table.TransformColumnTypes(Headers, {{\"seller_id\", type text}, {\"seller_state\", type text}}, \"en-US\")",
+                "in",
+                " Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Category",
+        "columns": [
+          {
+            "name": "category",
+            "dataType": "string",
+            "sourceColumn": "category",
+            "summarizeBy": "none"
+          }
+        ],
+        "measures": [],
+        "partitions": [
+          {
+            "name": "Category",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                " Source = Csv.Document(File.Contents(SourceFolder & \"/dim_category.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                " Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                " Typed = Table.TransformColumnTypes(Headers, {{\"category\", type text}}, \"en-US\")",
+                "in",
+                " Typed"
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "expressions": [
+      {
+        "name": "SourceFolder",
+        "kind": "m",
+        "expression": "\"C:/Users/kvina/Downloads/olist-analytics/reports\" meta [IsParameterQuery=true, Type=\"Text\", IsParameterQueryRequired=true]"
+      }
+    ],
+    "relationships": [
+      {
+        "name": "Sales_Calendar",
+        "fromTable": "Sales",
+        "fromColumn": "day",
+        "toTable": "Calendar",
+        "toColumn": "day",
+        "fromCardinality": "many",
+        "toCardinality": "one",
+        "crossFilteringBehavior": "oneDirection",
+        "isActive": true
+      },
+      {
+        "name": "Items_Calendar",
+        "fromTable": "Items",
+        "fromColumn": "day",
+        "toTable": "Calendar",
+        "toColumn": "day",
+        "fromCardinality": "many",
+        "toCardinality": "one",
+        "crossFilteringBehavior": "oneDirection",
+        "isActive": true
+      },
+      {
+        "name": "Sales_State",
+        "fromTable": "Sales",
+        "fromColumn": "customer_state",
+        "toTable": "State",
+        "toColumn": "customer_state",
+        "fromCardinality": "many",
+        "toCardinality": "one",
+        "crossFilteringBehavior": "oneDirection",
+        "isActive": true
+      },
+      {
+        "name": "Items_State",
+        "fromTable": "Items",
+        "fromColumn": "customer_state",
+        "toTable": "State",
+        "toColumn": "customer_state",
+        "fromCardinality": "many",
+        "toCardinality": "one",
+        "crossFilteringBehavior": "oneDirection",
+        "isActive": true
+      },
+      {
+        "name": "Delivery_State",
+        "fromTable": "Delivery",
+        "fromColumn": "customer_state",
+        "toTable": "State",
+        "toColumn": "customer_state",
+        "fromCardinality": "many",
+        "toCardinality": "one",
+        "crossFilteringBehavior": "oneDirection",
+        "isActive": true
+      },
+      {
+        "name": "Items_Seller",
+        "fromTable": "Items",
+        "fromColumn": "seller_id",
+        "toTable": "Seller",
+        "toColumn": "seller_id",
+        "fromCardinality": "many",
+        "toCardinality": "one",
+        "crossFilteringBehavior": "oneDirection",
+        "isActive": true
+      },
+      {
+        "name": "Items_Category",
+        "fromTable": "Items",
+        "fromColumn": "category",
+        "toTable": "Category",
+        "toColumn": "category",
+        "fromCardinality": "many",
+        "toCardinality": "one",
+        "crossFilteringBehavior": "oneDirection",
+        "isActive": true
+      }
+    ]
+  }
+}

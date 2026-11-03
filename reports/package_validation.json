@@ -1,0 +1,34 @@
+{
+  "package_version": "2.2.0",
+  "checked_on": "2026-10-30",
+  "python_tests": {
+    "passed": 35,
+    "skipped": 1,
+    "failed": 0,
+    "skip_reason": "COPY/rollback integration requires OLIST_DB_TEST=1 and PostgreSQL"
+  },
+  "ruff_check": "passed",
+  "ruff_format_check": "passed",
+  "sqlfluff_showcase": "passed",
+  "source_checks": {
+    "passed": 14,
+    "total": 14,
+    "source_rows": 1550922
+  },
+  "raw_sha256_matches": 9,
+  "local_failure_demo": "reports/local_failure_demo.json",
+  "report_attachment": "MIME preview contains operating_review.xlsx; no SMTP transmission",
+  "workflow_configuration": "Five isolated March-July replay cutoffs; parsed locally, not executed on GitHub",
+  "pdf": "Rendered and visually checked, one page, three computed charts",
+  "not_verified": [
+    "Current COPY path against PostgreSQL",
+    "Five actual full replays",
+    "Native Power BI Desktop refresh and screenshots",
+    "Native Excel screenshots",
+    "GitHub green/red/scheduled runs",
+    "Inbox receipt",
+    "Measured manual timing",
+    "Measured INSERT/COPY comparison"
+  ],
+  "scope": "Source gates, analytics refresh, interface tests, report rendering and packaging. Existing SQL marts are bundled historical reference exports; current full database pipeline not rerun here."
+}

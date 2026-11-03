@@ -1,0 +1,91 @@
+{
+  "rows": 1550922,
+  "checks": [
+    {
+      "name": "customers: row count",
+      "observed": 99441,
+      "limit": "99441 +/- 1%",
+      "passed": true
+    },
+    {
+      "name": "geolocation: row count",
+      "observed": 1000163,
+      "limit": "1000163 +/- 1%",
+      "passed": true
+    },
+    {
+      "name": "order_items: row count",
+      "observed": 112650,
+      "limit": "112650 +/- 1%",
+      "passed": true
+    },
+    {
+      "name": "order_payments: row count",
+      "observed": 103886,
+      "limit": "103886 +/- 1%",
+      "passed": true
+    },
+    {
+      "name": "order_reviews: row count",
+      "observed": 99224,
+      "limit": "99224 +/- 1%",
+      "passed": true
+    },
+    {
+      "name": "orders: row count",
+      "observed": 99441,
+      "limit": "99441 +/- 1%",
+      "passed": true
+    },
+    {
+      "name": "product_category_name_translation: row count",
+      "observed": 71,
+      "limit": "71 +/- 1%",
+      "passed": true
+    },
+    {
+      "name": "products: row count",
+      "observed": 32951,
+      "limit": "32951 +/- 1%",
+      "passed": true
+    },
+    {
+      "name": "sellers: row count",
+      "observed": 3095,
+      "limit": "3095 +/- 1%",
+      "passed": true
+    },
+    {
+      "name": "delivered timestamp null rate",
+      "observed": 8.292045855013578e-05,
+      "limit": 0.001,
+      "passed": true
+    },
+    {
+      "name": "delivered review null rate",
+      "observed": 0.0066958270279234644,
+      "limit": 0.05,
+      "passed": true
+    },
+    {
+      "name": "delivery before purchase",
+      "observed": 0,
+      "limit": 0,
+      "passed": true
+    },
+    {
+      "name": "delivered orders without seller",
+      "observed": 0,
+      "limit": 0,
+      "passed": true
+    },
+    {
+      "name": "missing or duplicate order IDs",
+      "observed": 0,
+      "limit": 0,
+      "passed": true
+    }
+  ],
+  "passed": 14,
+  "total": 14
+}

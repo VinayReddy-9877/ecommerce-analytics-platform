@@ -1,0 +1,6 @@
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.pdf binary
+*.xlsx binary
+reports/dashboard_snapshot.html -whitespace

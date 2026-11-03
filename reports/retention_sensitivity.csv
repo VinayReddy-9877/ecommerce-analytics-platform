@@ -1,0 +1,5 @@
+definition,experience,customers,repeat_customers,repeat_rate
+After first delivery,On time,61376,704,0.011470281543274244
+After first delivery,Late,4835,37,0.0076525336091003105
+After first purchase through delivery + 90 days,On time,61376,1329,0.021653415015641293
+After first purchase through delivery + 90 days,Late,4835,98,0.020268872802481904

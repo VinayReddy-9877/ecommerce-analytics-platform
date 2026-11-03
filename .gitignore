@@ -1,0 +1,51 @@
+
+# Python virtual environments
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Testing and development caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Environment variables and credentials
+.env
+.env.*
+!.env.example
+.streamlit/secrets.toml
+
+# Generated dbt files
+dbt_project/target/
+dbt_project/logs/
+dbt_packages/
+
+# Temporary data and files
+data/raw/
+upload-check/
+*.zip
+*.log
+
+# Generated local run outputs
+reports/last_run.json
+reports/run_history.csv
+reports/email_preview.eml
+reports/local_failure_demo.json
+
+# Editor and operating system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Power BI local cache
+**/.pbi/
+
+
+# Python packaging metadata
+*.egg-info/

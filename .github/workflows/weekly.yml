@@ -1,0 +1,116 @@
+name: Historical analytics replay
+on:
+  workflow_dispatch:
+    inputs:
+      demo_failure:
+        description: 'Inject a bad timestamp into a temporary copy (expected red run)'
+        type: boolean
+        default: false
+      send_email:
+        description: 'Email the July report and workbook to configured SMTP_TO'
+        type: boolean
+        default: false
+  schedule:
+    - cron: '30 3 * * 1'
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: olist-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements-dev.txt
+      - run: ruff check .
+      - run: ruff format --check .
+      - run: sqlfluff lint sql/showcase
+  replay:
+    needs: lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        cutoff: ['2018-03-31', '2018-04-30', '2018-05-31', '2018-06-30', '2018-07-31']
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: olist
+          POSTGRES_PASSWORD: olist_ci
+          POSTGRES_DB: olist
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U olist"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      PGHOST: localhost
+      PGPORT: '5432'
+      PGUSER: olist
+      PGPASSWORD: olist_ci
+      PGDATABASE: olist
+      REPLAY_CUTOFF: ${{ matrix.cutoff }}
+      DEMO_FAILURE: ${{ inputs.demo_failure || false }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -r requirements.lock && pip install --no-deps -e .
+      - name: Check bundled reference reports and COPY transaction behavior
+        run: pytest -q
+        env:
+          OLIST_DB_TEST: '1'
+      - name: Clear prior run status
+        run: rm -f reports/last_run.json reports/run_history.csv reports/quality_checks.json
+      - run: olist download
+      - name: Run historical replay with quality gate
+        shell: bash
+        run: |
+          args=(run --cutoff "$REPLAY_CUTOFF" --reporting-end "$REPLAY_CUTOFF")
+          if [[ "$DEMO_FAILURE" == "true" && "$REPLAY_CUTOFF" == "2018-07-31" ]]; then
+            args+=(--demo-failure)
+          fi
+          olist "${args[@]}"
+      - run: python scripts/build_snapshot.py
+      - run: python scripts/run_evidence.py
+      - name: Add run summary
+        if: always()
+        run: python scripts/action_summary.py
+      - name: Send July report
+        if: success() && github.event_name == 'workflow_dispatch' && inputs.send_email && matrix.cutoff == '2018-07-31'
+        env:
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          SMTP_FROM: ${{ secrets.SMTP_FROM }}
+          SMTP_TO: ${{ secrets.SMTP_TO }}
+        run: python scripts/send_configured_report.py
+      - name: Notify failed July run
+        if: failure() && matrix.cutoff == '2018-07-31'
+        env:
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          SMTP_FROM: ${{ secrets.SMTP_FROM }}
+          SMTP_TO: ${{ secrets.SMTP_TO }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: python scripts/send_alert.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: replay-${{ matrix.cutoff }}-${{ github.run_id }}
+          path: |
+            reports/
+            dbt_project/target/run_results.json
+            dbt_project/logs/
+          retention-days: 90

@@ -1,0 +1,101 @@
+{
+  "cutoff": "2018-08-31",
+  "reporting_end": "2018-07-31",
+  "reporting_policy": "Preserve August in descriptive totals; exclude August from comparisons and forecasting due to end-of-snapshot coverage uncertainty.",
+  "retention": {
+    "groups": [
+      {
+        "experience": "On time",
+        "customers": 61376,
+        "repeat_customers": 704,
+        "repeat_rate": 0.011470281543274244,
+        "ci95": [
+          0.010657903933109248,
+          0.0123438084412684
+        ],
+        "repeat_rate_30d": 0.00568626173096976,
+        "repeat_rate_60d": 0.0090915015641293,
+        "followup_gmv": 90170.19,
+        "followup_gmv_per_customer": 1.4691441279979145
+      },
+      {
+        "experience": "Late",
+        "customers": 4835,
+        "repeat_customers": 37,
+        "repeat_rate": 0.0076525336091003105,
+        "ci95": [
+          0.005557140720012772,
+          0.01052965598187078
+        ],
+        "repeat_rate_30d": 0.003516028955532575,
+        "repeat_rate_60d": 0.0062047569803516025,
+        "followup_gmv": 5203.0,
+        "followup_gmv_per_customer": 1.0761116856256463
+      }
+    ],
+    "adjusted": {
+      "method": "Mantel-Haenszel odds ratio, stratified by first-purchase month, state and basket band; >=20 customers per exposure group and outcome variation per stratum.",
+      "strata": 42,
+      "overlap_customers": 16042,
+      "odds_ratio": 0.4263723807360854,
+      "ci95": [
+        0.2291700761791756,
+        0.7932685195445108
+      ]
+    },
+    "eligible_customers": 66211,
+    "risk_difference_pp": -0.38177479341739334,
+    "interpretation": "Association, not causal lift. Equal 90-day follow-up begins at first delivery. Excludes earlier repeat purchases and customers whose first observed order was not delivered. Adjustment covers only observed strata and may not generalize outside overlap."
+  },
+  "delivered_orders": 96478,
+  "gmv_brl": 13221498.11,
+  "aov_brl": 137.0415857501192,
+  "customers": 93358,
+  "repeat_customer_rate": 0.03000278497825575,
+  "customers_for_80pct_gmv": 42009,
+  "customer_share_for_80pct_gmv": 0.4499775059448574,
+  "late_rate": 0.06773090079817559,
+  "anomaly_days": 30,
+  "delivery_test": {
+    "late_n": 6381,
+    "on_time_n": 89443,
+    "late_mean": 2.270490518727472,
+    "on_time_mean": 4.290386055923885,
+    "difference_points": -2.0198955371964127,
+    "ci95": [
+      -2.0591810456870627,
+      -1.9806100287057626
+    ],
+    "welch_p_value": 0.0,
+    "interpretation": "Observational association; reviews are ordinal and confounding is not controlled."
+  },
+  "forecast": {
+    "model": "last_month",
+    "rolling_origin_mae_brl": {
+      "last_month": 80801.99833333331,
+      "damped_trend": 109988.6914925134
+    },
+    "history_months": 19,
+    "warning": "Historical extrapolation with few backtests. Bands are empirical error ranges, not calibrated confidence intervals.",
+    "months": [
+      {
+        "month": "2018-08-01",
+        "gmv": 867953.46,
+        "lower": 722874.284,
+        "upper": 1013032.6359999999
+      },
+      {
+        "month": "2018-09-01",
+        "gmv": 867953.46,
+        "lower": 722874.284,
+        "upper": 1013032.6359999999
+      },
+      {
+        "month": "2018-10-01",
+        "gmv": 867953.46,
+        "lower": 722874.284,
+        "upper": 1013032.6359999999
+      }
+    ]
+  }
+}

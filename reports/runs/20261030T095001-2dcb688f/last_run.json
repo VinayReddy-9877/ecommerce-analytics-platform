@@ -1,0 +1,22 @@
+{
+  "command": "run",
+  "cutoff": "2018-08-31",
+  "status": "success",
+  "started_at": "2026-10-30T09:50:01.845119+00:00",
+  "seconds": {
+    "quality": 5.087,
+    "ingest": 171.352,
+    "build": 67.077,
+    "analyze": 146.653,
+    "deepdive": 20.02,
+    "report": 0.149,
+    "excel": 0.141
+  },
+  "run_id": "20261030T095001-2dcb688f",
+  "checks_passed": 48,
+  "checks_total": 48,
+  "source_rows": 1550922,
+  "active_step": "excel",
+  "finished_at": "2026-10-30T09:59:02.948827+00:00",
+  "total_seconds": 410.479
+}

@@ -1,0 +1,13 @@
+{
+  "file": "sales.csv",
+  "grain": "line",
+  "order_id": "order_number",
+  "customer_id": "buyer_id",
+  "date": "purchase_date",
+  "date_format": "%Y-%m-%d",
+  "amount": "line_total",
+  "amount_definition": "Additive merchandise line amount, excluding freight",
+  "currency": "BRL",
+  "status": "status",
+  "include_statuses": ["delivered"]
+}

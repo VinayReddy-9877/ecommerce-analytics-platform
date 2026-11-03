@@ -1,0 +1,45 @@
+{
+  "groups": [
+    {
+      "experience": "On time",
+      "customers": 61376,
+      "repeat_customers": 704,
+      "repeat_rate": 0.011470281543274244,
+      "ci95": [
+        0.010657903933109248,
+        0.0123438084412684
+      ],
+      "repeat_rate_30d": 0.00568626173096976,
+      "repeat_rate_60d": 0.0090915015641293,
+      "followup_gmv": 90170.19,
+      "followup_gmv_per_customer": 1.4691441279979145
+    },
+    {
+      "experience": "Late",
+      "customers": 4835,
+      "repeat_customers": 37,
+      "repeat_rate": 0.0076525336091003105,
+      "ci95": [
+        0.005557140720012772,
+        0.01052965598187078
+      ],
+      "repeat_rate_30d": 0.003516028955532575,
+      "repeat_rate_60d": 0.0062047569803516025,
+      "followup_gmv": 5203.0,
+      "followup_gmv_per_customer": 1.0761116856256463
+    }
+  ],
+  "adjusted": {
+    "method": "Mantel-Haenszel odds ratio, stratified by first-purchase month, state and basket band; >=20 customers per exposure group and outcome variation per stratum.",
+    "strata": 42,
+    "overlap_customers": 16042,
+    "odds_ratio": 0.4263723807360854,
+    "ci95": [
+      0.2291700761791756,
+      0.7932685195445108
+    ]
+  },
+  "eligible_customers": 66211,
+  "risk_difference_pp": -0.38177479341739334,
+  "interpretation": "Association, not causal lift. Equal 90-day follow-up begins at first delivery. Excludes earlier repeat purchases and customers whose first observed order was not delivered. Adjustment covers only observed strata and may not generalize outside overlap."
+}

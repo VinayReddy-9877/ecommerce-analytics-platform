@@ -1,0 +1,38 @@
+{
+  "delivered_orders": 96478,
+  "handoff_eligible_orders": 93859,
+  "eligible_late_orders": 6496,
+  "late_orders_with_timely_handoff": 4684,
+  "late_orders_with_late_handoff": 1812,
+  "models": {
+    "transit_days_distance_only_r2": 0.18374526611642872,
+    "transit_days_state_month_r2": 0.30176393007971647,
+    "transit_days_adjusted_RJ_minus_SP": 4.528072008673785,
+    "late_distance_only_r2": 0.004495916549422607,
+    "late_state_month_r2": 0.056560714731038075,
+    "late_adjusted_RJ_minus_SP": 0.07388803755076379,
+    "orders": 93394,
+    "transit_distance_spearman": 0.6164090831255354
+  },
+  "seller_count": 2970,
+  "sellers_for_80pct_gmv": 533,
+  "top_10_seller_share": 0.13272323494663343,
+  "rj_scenario": {
+    "known_orders": 12350,
+    "late_orders": 1495,
+    "rj_late_rate": 0.12105263157894737,
+    "sp_late_rate": 0.044944930113103174,
+    "fewer_late_orders": 939.9301131031758,
+    "average_review_change_scenario_range": [
+      0,
+      0.15372960653713558
+    ]
+  },
+  "caveats": [
+    "Handoff timestamp is order-level and may not identify seller or carrier fault.",
+    "Geolocation uses median coordinates per ZIP prefix; distance is straight-line, not a route.",
+    "Models are descriptive in-sample associations; R squared is not a causal attribution.",
+    "RJ scenario assumes SP rate is attainable. Review range assumes zero to full transfer of the observed association; it is not a confidence interval or forecast.",
+    "Retention sensitivity includes a longer exposure window when counting pre-delivery purchases."
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "handoff": [
+    {
+      "late_handoff": 0.0,
+      "orders": 85212,
+      "late_orders": 4684.0,
+      "late_rate": 0.05496878373937943,
+      "order_share": 0.9078724469683248,
+      "late_order_share": 0.7210591133004927,
+      "handoff": "Timely"
+    },
+    {
+      "late_handoff": 1.0,
+      "orders": 8647,
+      "late_orders": 1812.0,
+      "late_rate": 0.20955244593500635,
+      "order_share": 0.09212755303167518,
+      "late_order_share": 0.2789408866995074,
+      "handoff": "Late"
+    }
+  ],
+  "handoff_rate_ratio": 3.8122081603359863,
+  "handoff_scenario_fewer": 1336.684927005586,
+  "retention_differences": [
+    {
+      "definition": "After first delivery",
+      "late_n": 4835,
+      "late_repeat": 37,
+      "on_time_n": 61376,
+      "on_time_repeat": 704,
+      "difference_pp": -0.38177479341739334,
+      "ci95_pp": [
+        -0.6414509328200458,
+        -0.12209865401474085
+      ]
+    },
+    {
+      "definition": "After first purchase through delivery + 90 days",
+      "late_n": 4835,
+      "late_repeat": 98,
+      "on_time_n": 61376,
+      "on_time_repeat": 1329,
+      "difference_pp": -0.13845422131593885,
+      "ci95_pp": [
+        -0.5520161418978461,
+        0.27510769926596845
+      ]
+    }
+  ],
+  "rj_distance_scenario": {
+    "eligible_rj_orders": 12005,
+    "observed_late": 1481,
+    "expected_late": 653.6027927221077,
+    "fewer_late": 827.3972072778923,
+    "reference": "Non-RJ eligible single-seller orders, standardized to RJ distance bands"
+  },
+  "limitations": [
+    "Scenarios are comparisons, not avoidable orders or causal effects.",
+    "SP comparison is not a statistical upper bound.",
+    "Distance-only R squared is in-sample fit, not a causal fraction.",
+    "Retention intervals use an unpooled normal approximation; only 37 late-customer repeat events in the full snapshot."
+  ]
+}

@@ -1,0 +1,406 @@
+version: 2
+models:
+- name: stg_orders
+  columns:
+  - name: order_id
+    data_tests:
+    - unique
+    - not_null
+    description: Order identifier. Unique in the order fact; repeated on child item/payment tables.
+  - name: order_status
+    data_tests:
+    - accepted_values:
+        arguments:
+          values:
+          - delivered
+          - shipped
+          - canceled
+          - unavailable
+          - invoiced
+          - processing
+          - created
+          - approved
+    description: Final source-snapshot status; not status reconstructed as of the purchase date.
+  - name: customer_id
+    data_tests:
+    - relationships:
+        arguments:
+          to: ref('stg_customers')
+          field: customer_id
+    description: Order-specific customer identifier; use customer_unique_id for repeat purchases.
+  - name: purchased_at
+    description: Timestamp when the order was purchased.
+  - name: approved_at
+    description: Payment approval timestamp.
+  - name: carrier_at
+    description: Order-level timestamp of handoff to carrier; not a separate timestamp for every seller.
+  - name: delivered_at
+    description: Actual customer-delivery timestamp, nullable even for some delivered statuses.
+  - name: estimated_at
+    description: Promised delivery date represented as a timestamp.
+  description: Historical Olist stg orders. See docs/metric_contract.md for inclusion and date rules.
+- name: stg_customers
+  columns:
+  - name: customer_id
+    data_tests:
+    - unique
+    - not_null
+    description: Order-specific customer identifier; use customer_unique_id for repeat purchases.
+  - name: customer_unique_id
+    description: Stable observed buyer identifier used for cohorts and repeat purchases.
+  - name: zip_prefix
+    description: Zip prefix; defined by this model SQL and its documented grain.
+  - name: city
+    description: City; defined by this model SQL and its documented grain.
+  - name: state
+    description: State; defined by this model SQL and its documented grain.
+  description: Historical Olist stg customers. See docs/metric_contract.md for inclusion and date rules.
+- name: stg_products
+  columns:
+  - name: product_id
+    data_tests:
+    - unique
+    - not_null
+    description: Product id; defined by this model SQL and its documented grain.
+  - name: category
+    description: Product category; missing values use the documented unknown category in business marts.
+  - name: weight_g
+    description: Weight g; defined by this model SQL and its documented grain.
+  description: Historical Olist stg products. See docs/metric_contract.md for inclusion and date rules.
+- name: stg_sellers
+  columns:
+  - name: seller_id
+    data_tests:
+    - unique
+    - not_null
+    description: Seller id; defined by this model SQL and its documented grain.
+  - name: zip_prefix
+    description: Zip prefix; defined by this model SQL and its documented grain.
+  - name: city
+    description: City; defined by this model SQL and its documented grain.
+  - name: state
+    description: State; defined by this model SQL and its documented grain.
+  description: Historical Olist stg sellers. See docs/metric_contract.md for inclusion and date rules.
+- name: stg_geolocation
+  columns:
+  - name: zip_prefix
+    data_tests:
+    - unique
+    - not_null
+    description: Zip prefix; defined by this model SQL and its documented grain.
+  - name: latitude
+    description: Latitude; defined by this model SQL and its documented grain.
+  - name: longitude
+    description: Longitude; defined by this model SQL and its documented grain.
+  description: Historical Olist stg geolocation. See docs/metric_contract.md for inclusion and date rules.
+- name: stg_product_category_name_translation
+  columns:
+  - name: category
+    data_tests:
+    - unique
+    - not_null
+    description: Product category; missing values use the documented unknown category in business marts.
+  - name: category_english
+    description: Category english; defined by this model SQL and its documented grain.
+  description: Historical Olist stg product category name translation. See docs/metric_contract.md for
+    inclusion and date rules.
+- name: int_order_totals
+  columns:
+  - name: order_id
+    data_tests:
+    - unique
+    - not_null
+    description: Order identifier. Unique in the order fact; repeated on child item/payment tables.
+  - name: customer_id
+    description: Order-specific customer identifier; use customer_unique_id for repeat purchases.
+  - name: order_status
+    description: Final source-snapshot status; not status reconstructed as of the purchase date.
+  - name: purchased_at
+    description: Timestamp when the order was purchased.
+  - name: approved_at
+    description: Payment approval timestamp.
+  - name: carrier_at
+    description: Order-level timestamp of handoff to carrier; not a separate timestamp for every seller.
+  - name: delivered_at
+    description: Actual customer-delivery timestamp, nullable even for some delivered statuses.
+  - name: estimated_at
+    description: Promised delivery date represented as a timestamp.
+  - name: customer_unique_id
+    description: Stable observed buyer identifier used for cohorts and repeat purchases.
+  - name: customer_state
+    description: Customer state; defined by this model SQL and its documented grain.
+  - name: merchandise_value
+    description: Sum of item prices per order in BRL, aggregated before joining payments and reviews.
+  - name: freight_value
+    description: Sum of freight charges on order items in BRL.
+  - name: item_count
+    description: Item count; defined by this model SQL and its documented grain.
+  - name: seller_count
+    description: Distinct sellers supplying an order.
+  - name: payment_value
+    description: Payment value; defined by this model SQL and its documented grain.
+  - name: review_score
+    description: Latest answered review selected deterministically per order, on a one-to-five scale.
+  - name: is_late
+    description: Actual delivery calendar date is later than estimated delivery date; null when dates
+      are missing.
+  - name: delivery_days
+    description: Delivery days; defined by this model SQL and its documented grain.
+  description: Historical Olist int order totals. See docs/metric_contract.md for inclusion and date rules.
+- name: fct_orders
+  columns:
+  - name: order_id
+    data_tests:
+    - unique
+    - not_null
+    description: Order identifier. Unique in the order fact; repeated on child item/payment tables.
+  - name: customer_id
+    description: Order-specific customer identifier; use customer_unique_id for repeat purchases.
+  - name: order_status
+    description: Final source-snapshot status; not status reconstructed as of the purchase date.
+  - name: purchased_at
+    description: Timestamp when the order was purchased.
+  - name: approved_at
+    description: Payment approval timestamp.
+  - name: carrier_at
+    description: Order-level timestamp of handoff to carrier; not a separate timestamp for every seller.
+  - name: delivered_at
+    description: Actual customer-delivery timestamp, nullable even for some delivered statuses.
+  - name: estimated_at
+    description: Promised delivery date represented as a timestamp.
+  - name: customer_unique_id
+    description: Stable observed buyer identifier used for cohorts and repeat purchases.
+  - name: customer_state
+    description: Customer state; defined by this model SQL and its documented grain.
+  - name: merchandise_value
+    description: Sum of item prices per order in BRL, aggregated before joining payments and reviews.
+  - name: freight_value
+    description: Sum of freight charges on order items in BRL.
+  - name: item_count
+    description: Item count; defined by this model SQL and its documented grain.
+  - name: seller_count
+    description: Distinct sellers supplying an order.
+  - name: payment_value
+    description: Payment value; defined by this model SQL and its documented grain.
+  - name: review_score
+    description: Latest answered review selected deterministically per order, on a one-to-five scale.
+  - name: is_late
+    description: Actual delivery calendar date is later than estimated delivery date; null when dates
+      are missing.
+  - name: delivery_days
+    description: Delivery days; defined by this model SQL and its documented grain.
+  description: Historical Olist fct orders. See docs/metric_contract.md for inclusion and date rules.
+- name: daily_sales
+  columns:
+  - name: day
+    data_tests:
+    - unique
+    - not_null
+    description: Day; defined by this model SQL and its documented grain.
+  - name: orders
+    description: Orders; defined by this model SQL and its documented grain.
+  - name: gmv
+    description: Delivered merchandise value in BRL, excluding freight. Not platform revenue.
+  - name: freight
+    description: Freight; defined by this model SQL and its documented grain.
+  - name: aov
+    description: Aov; defined by this model SQL and its documented grain.
+  description: Historical Olist daily sales. See docs/metric_contract.md for inclusion and date rules.
+- name: monthly_sales
+  columns:
+  - name: month
+    data_tests:
+    - unique
+    - not_null
+    description: Month; defined by this model SQL and its documented grain.
+  - name: orders
+    description: Orders; defined by this model SQL and its documented grain.
+  - name: gmv
+    description: Delivered merchandise value in BRL, excluding freight. Not platform revenue.
+  - name: previous_gmv
+    description: Previous calendar-month merchandise GMV, after filling observed missing months with zero.
+  - name: cumulative_gmv
+    description: Cumulative gmv; defined by this model SQL and its documented grain.
+  - name: mom_pct
+    description: Percentage change from previous month; null when previous GMV is zero.
+  - name: aov
+    description: Aov; defined by this model SQL and its documented grain.
+  description: Historical Olist monthly sales. See docs/metric_contract.md for inclusion and date rules.
+- name: customer_rfm
+  columns:
+  - name: customer_unique_id
+    data_tests:
+    - unique
+    - not_null
+    description: Stable observed buyer identifier used for cohorts and repeat purchases.
+  - name: recency_days
+    description: Days between analysis cutoff and most recent delivered-order purchase.
+  - name: frequency
+    description: Number of delivered orders per stable customer in the purchase window.
+  - name: monetary_value
+    description: Total delivered merchandise value per stable customer in BRL.
+  - name: segment
+    description: Segment; defined by this model SQL and its documented grain.
+  - name: monetary_percentile
+    description: Monetary percentile; defined by this model SQL and its documented grain.
+  description: Historical Olist customer rfm. See docs/metric_contract.md for inclusion and date rules.
+- name: seller_scorecard
+  columns:
+  - name: seller_id
+    data_tests:
+    - unique
+    - not_null
+    description: Seller id; defined by this model SQL and its documented grain.
+  - name: orders
+    description: Orders; defined by this model SQL and its documented grain.
+  - name: gmv
+    description: Delivered merchandise value in BRL, excluding freight. Not platform revenue.
+  - name: mean_order_review_score
+    description: Mean order review score; defined by this model SQL and its documented grain.
+  - name: late_rate
+    description: Late deliveries divided by deliveries with known actual and estimated dates.
+  - name: state
+    description: State; defined by this model SQL and its documented grain.
+  - name: gmv_rank
+    description: Gmv rank; defined by this model SQL and its documented grain.
+  description: Historical Olist seller scorecard. See docs/metric_contract.md for inclusion and date rules.
+- name: stg_order_payments
+  description: Historical Olist stg order payments. See docs/metric_contract.md for inclusion and date
+    rules.
+  columns:
+  - name: order_id
+    description: Order identifier. Unique in the order fact; repeated on child item/payment tables.
+  - name: payment_number
+    description: Payment number; defined by this model SQL and its documented grain.
+  - name: payment_type
+    description: Payment type; defined by this model SQL and its documented grain.
+  - name: installments
+    description: Installments; defined by this model SQL and its documented grain.
+  - name: payment_value
+    description: Payment value; defined by this model SQL and its documented grain.
+- name: stg_order_reviews
+  description: Historical Olist stg order reviews. See docs/metric_contract.md for inclusion and date
+    rules.
+  columns:
+  - name: review_id
+    description: Review id; defined by this model SQL and its documented grain.
+  - name: order_id
+    description: Order identifier. Unique in the order fact; repeated on child item/payment tables.
+  - name: score
+    description: Score; defined by this model SQL and its documented grain.
+  - name: answered_at
+    description: Answered at; defined by this model SQL and its documented grain.
+- name: stg_order_items
+  description: Historical Olist stg order items. See docs/metric_contract.md for inclusion and date rules.
+  columns:
+  - name: order_id
+    description: Order identifier. Unique in the order fact; repeated on child item/payment tables.
+  - name: item_number
+    description: Item number; defined by this model SQL and its documented grain.
+  - name: product_id
+    description: Product id; defined by this model SQL and its documented grain.
+  - name: seller_id
+    description: Seller id; defined by this model SQL and its documented grain.
+  - name: price
+    description: Price; defined by this model SQL and its documented grain.
+  - name: freight
+    description: Freight; defined by this model SQL and its documented grain.
+  - name: shipping_limit_at
+    description: Shipping limit at; defined by this model SQL and its documented grain.
+- name: cohort_retention
+  description: Historical Olist cohort retention. See docs/metric_contract.md for inclusion and date rules.
+  columns:
+  - name: cohort
+    description: Cohort; defined by this model SQL and its documented grain.
+  - name: cohort_size
+    description: Cohort size; defined by this model SQL and its documented grain.
+  - name: month
+    description: Month; defined by this model SQL and its documented grain.
+  - name: month_number
+    description: Month number; defined by this model SQL and its documented grain.
+  - name: active_customers
+    description: Active customers; defined by this model SQL and its documented grain.
+  - name: retention
+    description: Distinct active customers divided by original cohort size; unobserved future months omitted.
+- name: weekly_kpis
+  description: Historical Olist weekly kpis. See docs/metric_contract.md for inclusion and date rules.
+  columns:
+  - name: week
+    description: Week; defined by this model SQL and its documented grain.
+  - name: orders
+    description: Orders; defined by this model SQL and its documented grain.
+  - name: gmv
+    description: Delivered merchandise value in BRL, excluding freight. Not platform revenue.
+  - name: aov
+    description: Aov; defined by this model SQL and its documented grain.
+  - name: is_complete_week
+    description: Is complete week; defined by this model SQL and its documented grain.
+- name: repeat_delivery
+  description: Historical Olist repeat delivery. See docs/metric_contract.md for inclusion and date rules.
+  columns:
+  - name: customer_unique_id
+    description: Stable observed buyer identifier used for cohorts and repeat purchases.
+  - name: first_order_id
+    description: First order id; defined by this model SQL and its documented grain.
+  - name: first_purchase_at
+    description: First purchase at; defined by this model SQL and its documented grain.
+  - name: first_delivered_at
+    description: First delivered at; defined by this model SQL and its documented grain.
+  - name: customer_state
+    description: Customer state; defined by this model SQL and its documented grain.
+  - name: first_purchase_month
+    description: First purchase month; defined by this model SQL and its documented grain.
+  - name: first_is_late
+    description: Lateness of the first observed eligible order, using calendar dates.
+  - name: first_gmv
+    description: First gmv; defined by this model SQL and its documented grain.
+  - name: orders_30d
+    description: Orders 30d; defined by this model SQL and its documented grain.
+  - name: orders_60d
+    description: Orders 60d; defined by this model SQL and its documented grain.
+  - name: orders_90d
+    description: Orders 90d; defined by this model SQL and its documented grain.
+  - name: followup_gmv_90d
+    description: Followup gmv 90d; defined by this model SQL and its documented grain.
+  - name: repeat_30d
+    description: Repeat 30d; defined by this model SQL and its documented grain.
+  - name: repeat_60d
+    description: Repeat 60d; defined by this model SQL and its documented grain.
+  - name: repeat_90d
+    description: At least one subsequent delivered order purchased after first delivery and within 90
+      days.
+  - name: basket_band
+    description: Basket band; defined by this model SQL and its documented grain.
+- name: delivery_performance
+  description: Historical Olist delivery performance. See docs/metric_contract.md for inclusion and date
+    rules.
+  columns:
+  - name: customer_state
+    description: Customer state; defined by this model SQL and its documented grain.
+  - name: delivered_orders
+    description: Delivered orders; defined by this model SQL and its documented grain.
+  - name: delivery_denominator
+    description: Delivered orders with non-missing actual and estimated dates.
+  - name: late_rate
+    description: Late deliveries divided by deliveries with known actual and estimated dates.
+  - name: mean_delivery_days
+    description: Mean delivery days; defined by this model SQL and its documented grain.
+  - name: late_review_score
+    description: Late review score; defined by this model SQL and its documented grain.
+  - name: on_time_review_score
+    description: On time review score; defined by this model SQL and its documented grain.
+- name: category_growth
+  description: Historical Olist category growth. See docs/metric_contract.md for inclusion and date rules.
+  columns:
+  - name: month
+    description: Month; defined by this model SQL and its documented grain.
+  - name: category
+    description: Product category; missing values use the documented unknown category in business marts.
+  - name: gmv
+    description: Delivered merchandise value in BRL, excluding freight. Not platform revenue.
+  - name: previous_gmv
+    description: Previous calendar-month merchandise GMV, after filling observed missing months with zero.
+  - name: change_brl
+    description: Current less previous month merchandise GMV in BRL.
+  - name: mom_pct
+    description: Percentage change from previous month; null when previous GMV is zero.

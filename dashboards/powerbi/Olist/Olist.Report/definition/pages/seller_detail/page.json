@@ -1,0 +1,37 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/1.0.0/schema.json",
+  "name": "seller_detail",
+  "displayName": "Investigate sellers serving this state",
+  "displayOption": "FitToPage",
+  "height": 900,
+  "width": 1440,
+  "pageBinding": {
+    "name": "state_to_seller",
+    "type": "Drillthrough",
+    "parameters": [
+      {
+        "name": "state_parameter",
+        "boundFilter": "state_filter"
+      }
+    ]
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "state_filter",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "State"
+              }
+            },
+            "Property": "customer_state"
+          }
+        },
+        "type": "Categorical",
+        "howCreated": "Drillthrough"
+      }
+    ]
+  }
+}

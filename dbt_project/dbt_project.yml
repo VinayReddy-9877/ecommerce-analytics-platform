@@ -1,0 +1,21 @@
+name: olist
+version: '1.0.0'
+config-version: 2
+profile: olist
+model-paths: [models]
+test-paths: [tests]
+macro-paths: [macros]
+vars:
+  cutoff: '2018-08-31'
+  reporting_end: '2018-07-31'
+models:
+  olist:
+    staging:
+      +schema: staging
+      +materialized: view
+    intermediate:
+      +schema: intermediate
+      +materialized: view
+    marts:
+      +schema: marts
+      +materialized: table
